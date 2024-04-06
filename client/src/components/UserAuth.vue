@@ -47,8 +47,29 @@
     
     mounted() {
       // Check if user is already logged in
-      onAuthStateChanged(auth, user => {
-        this.user = user;
+      //onAuthStateChanged(auth, user => {
+        //this.user = user;
+      //});
+
+      // Listen for authentication state changes
+      const auth = getAuth(); // Assuming you have initialized Firebase Authentication
+      onAuthStateChanged(auth, (user) => {
+        this.user = user
+        if (user) {
+          // User is signed in, access the UID
+          this.userId = user.uid;
+          // If user is authenticated, update user information in the store
+          this.$store.dispatch('auth/updateUser', {
+            userId: user.uid,
+            email: user.email,
+            // Other user information you may need
+          });
+        } else {
+          // User is signed out, reset userId
+          this.userId = null;
+          // If user is not authenticated, clear user information in the store
+          this.$store.dispatch('auth/updateUser', null);
+        }
       });
     },
     methods: {
