@@ -1,0 +1,1 @@
+{"version":3,"file":"js/app.d540047d.js","mappings":"YAAAA,MAAM,mCACLC,MAAKC,GAAOA,EAAIC,SAChBF,MAAKG,GAAQC,QAAQC,IAAIF,I","sources":["webpack://client/./src/main.js"],"sourcesContent":["fetch(\"http://localhost:5000/api/items\")\n.then(res => res.json())\n.then(data => console.log(data))\n"],"names":["fetch","then","res","json","data","console","log"],"sourceRoot":""}
