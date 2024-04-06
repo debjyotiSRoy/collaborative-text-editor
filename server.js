@@ -33,6 +33,7 @@ app.use(cors(corsOptions));
 
 // Define routes and API endpoints here
 // POST a new item
+/*
 app.post('/api/items', async (req, res) => {
   try {
     const { userId, ...newItem } = req.body; // Extract userId and other data from request body
@@ -48,6 +49,42 @@ app.post('/api/items', async (req, res) => {
     res.status(500).json({ error: 'Failed to create item' });
   }
 });
+*/
+
+// POST a new item
+app.post('/api/items', async (req, res) => {
+  try {
+    // Extract userId and other data from request body
+    const { userId, ...newItem } = req.body;
+
+    // Access Firestore database
+    const db = admin.firestore();
+
+    // Initialize userIds as an array with a single userId
+    let userIds = [userId];
+
+    // Check if userIds field already exists in the request body
+    //if (req.body.userIds) {
+      //// If userIds field exists, append the new userId to the existing list
+      //userIds = [...req.body.userIds.split(','), userId];
+    //}
+
+    // Add a new item document to the Firestore collection 'items'
+    const itemRef = await db.collection('items').add({
+      ...newItem,
+      //userIds: userIds.join(','), // Convert array of userIds to a comma-separated string
+      userIds: userIds, // Convert array of userIds to a comma-separated string
+    });
+
+    // Send a success response with the ID of the newly created item
+    res.status(201).json({ message: 'Item created successfully', itemId: itemRef.id });
+  } catch (error) {
+    // Handle errors and send an error response
+    console.error('Error creating item:', error);
+    res.status(500).json({ error: 'Failed to create item' });
+  }
+});
+
 
 
 // GET user-specific data
@@ -55,8 +92,10 @@ app.get('/api/items', async (req, res) => {
   try {
     // Extract userId from the query parameters
     const userId = req.query.userId;
+    console.log(userId);
     const db = admin.firestore();
-    const userSpecificData = await db.collection('items').where('userId', '==', userId).get();
+    //const userSpecificData = await db.collection('items').where('userId', '==', userId).get();
+    const userSpecificData = await db.collection('items').where('userIds', 'array-contains', userId).get();
     //console.log(userSpecificData);
 
     // Extract data from query snapshot and format as needed
@@ -65,6 +104,7 @@ app.get('/api/items', async (req, res) => {
       itemId: doc.id,
       ...doc.data()
     }));
+    console.log(formattedData);
 
     res.status(200).json(formattedData);
   } catch (error) {
