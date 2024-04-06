@@ -1,0 +1,10 @@
+export const firebaseConfig = {
+  apiKey: "AIzaSyCduBj-F_CEH0txJmRHfEsHEMf7lVCocXs",
+  authDomain: "doc-db-270ee.firebaseapp.com",
+  projectId: "doc-db-270ee",
+  storageBucket: "doc-db-270ee.appspot.com",
+  messagingSenderId: "588695260700",
+  appId: "1:588695260700:web:1b0318f0ea9985fae559d9",
+  measurementId: "G-7KGFT8SQTJ"
+};
+

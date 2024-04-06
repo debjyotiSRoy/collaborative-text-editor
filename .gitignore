@@ -1,0 +1,24 @@
+# Ignore node_modules directory for both backend and frontend
+/node_modules/
+
+# Ignore build output for Vue.js frontend
+/dist/
+/.nuxt/
+/nuxt.config.js
+
+# Ignore environment-specific files
+.env
+.env.local
+.env.*.local
+
+# Ignore dependency directories for backend
+/.pnp/
+.pnp.js
+
+# Ignore logs
+/logs/
+
+# Ignore any other files generated during development or build process
+.DS_Store
+.vscode/
+
