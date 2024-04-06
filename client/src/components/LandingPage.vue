@@ -50,9 +50,9 @@
         userId: null
       };
     },
-    mounted() {
-    },
     created() {
+    },
+    mounted() {
       // Listen for authentication state changes
       const auth = getAuth(); // Assuming you have initialized Firebase Authentication
       onAuthStateChanged(auth, (user) => {
@@ -69,7 +69,7 @@
           // User is signed out, reset userId
           this.userId = null;
           // If user is not authenticated, clear user information in the store
-          // this.store.dispatch('updateUser', null);
+          this.$store.dispatch('auth/updateUser', null);
         }
       });
       this.fetchUserData();
