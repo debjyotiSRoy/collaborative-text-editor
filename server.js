@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000; // Use port 5000 by default
 const corsOptions = {
   origin: "http://localhost:8081", // Replace with your frontend URL
   //origin: '*', // Replace with your frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Specify the allowed HTTP methods
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Specify the allowed HTTP methods
   allowedHeaders: ["Content-Type", "X-Auth-Token", "Origin", "Authorization"],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
@@ -35,7 +35,6 @@ app.use(cors(corsOptions));
 // POST a new item
 app.post('/api/items', async (req, res) => {
   try {
-    //const newItem = req.body; // Get data from request body
     const { userId, ...newItem } = req.body; // Extract userId and other data from request body
     const db = admin.firestore();
     const itemRef = await db.collection('items').add({
@@ -50,11 +49,6 @@ app.post('/api/items', async (req, res) => {
   }
 });
 
-// GET all items
-//app.get('/api/items',  (req, res) => {
-//// Implement logic to fetch all items from the database
-//res.json({ message: 'Get all items' });
-//});
 
 // GET user-specific data
 app.get('/api/items', async (req, res) => {
@@ -83,6 +77,7 @@ app.get('/api/items', async (req, res) => {
 app.get('/api/items/:id', async (req, res) => {
     try {
         const itemId = req.params.id; // Get the item ID from request parameters
+        console.log(itemId);
         const db = admin.firestore();
         const itemDoc = await db.collection('items').doc(itemId).get();
 
@@ -97,6 +92,25 @@ app.get('/api/items/:id', async (req, res) => {
     } catch (error) {
         console.error('Error fetching item:', error);
         return res.status(500).json({ error: 'Failed to fetch item' });
+    }
+});
+
+// PATCH an existing item
+app.patch('/api/items/:id', async (req, res) => {
+    try {
+        const { id } = req.params; // Get the document ID from the request parameters
+        const { content } = req.body; // Get the updated content from the request body
+        const db = admin.firestore();
+        
+        // Update the content field of the document with the specified ID
+        await db.collection('items').doc(id).update({
+            content: content
+        });
+
+        res.status(200).json({ message: 'Document content updated successfully' });
+    } catch (error) {
+        console.error('Error updating document content:', error);
+        res.status(500).json({ error: 'Failed to update document content' });
     }
 });
 
