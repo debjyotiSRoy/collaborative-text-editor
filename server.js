@@ -30,6 +30,16 @@ app.use(cors(corsOptions));
 // Enable CORS for all origins
 //app.use(cors());
 
+// Function to get user UID by email
+async function getUserUidByEmail(email) {
+  try {
+    const userRecord = await admin.auth().getUserByEmail(email);
+    return userRecord.uid;
+  } catch (error) {
+    console.error('Error fetching user UID by email:', error);
+    return null; // Return null or handle error as needed
+  }
+}
 
 // Define routes and API endpoints here
 // POST a new item
@@ -153,6 +163,39 @@ app.patch('/api/items/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to update document content' });
     }
 });
+
+
+// PATCH an item to invite a user
+app.patch('/api/items/invite/:id', async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    const { email } = req.body;
+
+    // Get the user ID corresponding to the email
+    const invitedUserId = await getUserUidByEmail(email);
+    if (!invitedUserId) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get the item from Firestore
+    const itemRef = admin.firestore().collection('items').doc(itemId);
+    const itemDoc = await itemRef.get();
+    if (!itemDoc.exists) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    // Update the userIds field to add the invited user ID
+    const currentIds = itemDoc.data().userIds || [];
+    const updatedIds = [...currentIds, invitedUserId];
+    await itemRef.update({ userIds: updatedIds });
+
+    return res.status(200).json({ message: 'Invitation sent successfully' });
+  } catch (error) {
+    console.error('Error inviting user:', error);
+    return res.status(500).json({ error: 'Failed to invite user' });
+  }
+});
+
 
 
 // Start server

@@ -17,6 +17,7 @@
           <th>Name</th>
           <th>Description</th>
           <th>Id</th>
+          <th>Invite</th> <!-- New column for invite button/link -->
         </tr>
       </thead>
       <tbody>
@@ -24,6 +25,7 @@
           <td><a href="#" @click="goToDocumentEditor(item.itemId)">{{ item.name }}</a></td>
           <td>{{ item.description }}</td>
           <td>{{ item.itemId }}</td>
+          <td><button @click="inviteUser(item.itemId)">Invite</button></td> <!-- Button for inviting users -->
         </tr>
       </tbody>
     </table>
@@ -122,6 +124,30 @@
         // Navigate to the editing component with the document ID as a parameter
         this.$router.push({ name: 'DocumentEditor', params: { documentId: documentId } });
       },
+      // Method to handle inviting users
+      inviteUser(itemId) {
+        // Open popup/modal to enter email address
+        const emailAddress = prompt('Enter the email address of the user you want to invite:');
+        if (emailAddress) {
+          // Send invitation to backend API
+          this.sendInvitation(itemId, emailAddress);
+        }
+      },
+      // Method to send invitation to backend API
+      async sendInvitation(itemId, emailAddress) {
+        try {
+          // Make API call to send invitation
+          const response = await axios.patch(`http://localhost:5000/api/items/invite/${itemId}`, 
+            { email: emailAddress });
+          console.log('Invitation sent successfully:', response.data);
+          // Optionally, handle success (e.g., show a message to the user)
+          alert('Invitation sent successfully!');
+        } catch (error) {
+          console.error('Error sending invitation:', error);
+          // Optionally, handle error (e.g., show an error message to the user)
+          alert('Failed to send invitation. Please try again.');
+        }
+      }
 
     }
   }
