@@ -1,12 +1,63 @@
 // server.js
+// Import required modules
+const http = require('http')
 const express = require('express');
 const cors = require('cors');
+const socketIo = require('socket.io');
+
+// Create Express app
 const app = express();
-const PORT = process.env.PORT || 5000; // Use port 5000 by default
+const server = http.createServer(app);
+
+// Create Socket.IO instance and attach it to the server
+const io = socketIo(server, {
+  cors: { origin: "*" }
+});
+
+// Define a map to store connected users for each document
+const documentUsersMap = new Map();
+
+
+// Define WebSocket event handlers
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  // Handle user joining a document editing session
+  socket.on('join', ({ documentId, userId }) => {
+    // Add the user to the document's connected users list
+    if (!documentUsersMap.has(documentId)) {
+      documentUsersMap.set(documentId, new Set());
+    }
+    documentUsersMap.get(documentId).add(userId);
+
+    // Notify other users that a new user has joined
+    socket.broadcast.emit('userJoined', { documentId, userId });
+
+    // Emit the list of connected users to the newly joined user
+    const connectedUsers = Array.from(documentUsersMap.get(documentId));
+    socket.emit('connectedUsers', connectedUsers);
+  });
+
+  // Handle user leaving a document editing session
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
+    // Find and remove the user from all document connected users lists
+    for (const [documentId, connectedUsers] of documentUsersMap.entries()) {
+      console.log(connectedUsers);
+      if (connectedUsers.has(socket.id)) {
+        connectedUsers.delete(socket.id);
+        // Notify other users that a user has left
+        socket.broadcast.emit('userLeft', { documentId, userId: socket.id });
+        break;
+      }
+    }
+  });
+});
 
 const corsOptions = {
-  origin: "http://localhost:8081", // Replace with your frontend URL
-  //origin: '*', // Replace with your frontend URL
+  //origin: "http://localhost:8081", // Replace with your frontend URL
+  //origin: "http://10.200.125.71:8081", // Replace with your frontend URL
+  origin: '*', // Replace with your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Specify the allowed HTTP methods
   allowedHeaders: ["Content-Type", "X-Auth-Token", "Origin", "Authorization"],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -60,6 +111,10 @@ app.post('/api/items', async (req, res) => {
   }
 });
 */
+
+app.get('/', (req, res) => {
+  res.status(201).json({msg: 'Hello'});
+});
 
 // POST a new item
 app.post('/api/items', async (req, res) => {
@@ -197,9 +252,9 @@ app.patch('/api/items/invite/:id', async (req, res) => {
 });
 
 
-
 // Start server
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 5000; // Use port 5000 by default
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 

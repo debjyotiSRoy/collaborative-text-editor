@@ -39,6 +39,7 @@
     onAuthStateChanged, 
   } from "firebase/auth";
   // import store from '@/store'; // Import your Vuex store
+  const backendUrl = process.env.VUE_APP_BACKEND_URL;
 
   export default {
     name: 'LandingPage',
@@ -79,7 +80,7 @@
     methods: {
       createNewItem() {
         console.log(this.$store.state.auth.user.userId)
-        axios.post('http://localhost:5000/api/items', {
+        axios.post('${backendUrl}/api/items', {
           ...this.newItem,
           userId: this.userId, // Include user ID in the request body 
         })
@@ -99,7 +100,7 @@
       },
       async getData() {
         try {
-          const response = await axios.get('http://localhost:5000/api/items');
+          const response = await axios.get('${backendUrl}/api/items');
           // Handle the response data here
           console.log(response.data);
         } catch (error) {
@@ -110,9 +111,8 @@
       // Make GET request to fetch user-specific data
       async fetchUserData() {
         try {
-          // const userId = 'slMqGwyHs4aqYwNv2IitAPSju7Q2';
           const userId = this.$store.state.auth.user.userId;
-          const response = await axios.get(`http://localhost:5000/api/items?userId=${userId}`);
+          const response = await axios.get(`${backendUrl}/api/items?userId=${userId}`);
           this.userData = response.data; // Store retrieved data in userData array
           console.log(response.data);
         } catch (error) {
@@ -137,7 +137,7 @@
       async sendInvitation(itemId, emailAddress) {
         try {
           // Make API call to send invitation
-          const response = await axios.patch(`http://localhost:5000/api/items/invite/${itemId}`, 
+          const response = await axios.patch(`${backendUrl}/api/items/invite/${itemId}`, 
             { email: emailAddress });
           console.log('Invitation sent successfully:', response.data);
           // Optionally, handle success (e.g., show a message to the user)
