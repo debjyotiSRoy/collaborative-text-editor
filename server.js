@@ -16,7 +16,8 @@ const io = socketIo(server, {
 
 // Define a map to store connected users for each document
 const documentUsersMap = new Map();
-
+// Define a new Map to store socket.ids and corresponding userIds
+const socketUserMap = new Map();
 
 // Define WebSocket event handlers
 io.on('connection', (socket) => {
@@ -30,6 +31,9 @@ io.on('connection', (socket) => {
     }
     documentUsersMap.get(documentId).add(userId);
 
+    // Store the mapping of socket.id to userId
+    socketUserMap.set(socket.id, userId);
+
     // Notify other users that a new user has joined
     socket.broadcast.emit('userJoined', { documentId, userId });
 
@@ -40,18 +44,21 @@ io.on('connection', (socket) => {
 
   // Handle user leaving a document editing session
   socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
+    console.log('A user disconnected:');
+    disconnectedUser = socketUserMap.get(socket.id);
+    console.log('the userId of the disconnected user:', disconnectedUser);
     // Find and remove the user from all document connected users lists
     for (const [documentId, connectedUsers] of documentUsersMap.entries()) {
-      console.log(connectedUsers);
-      if (connectedUsers.has(socket.id)) {
-        connectedUsers.delete(socket.id);
+      console.log('connectedUsers:', connectedUsers);
+      if (connectedUsers.has(disconnectedUser)) {
+        connectedUsers.delete(disconnectedUser);
         // Notify other users that a user has left
-        socket.broadcast.emit('userLeft', { documentId, userId: socket.id });
+        socket.broadcast.emit('userLeft', { documentId, userId: disconnectedUser });
         break;
       }
     }
   });
+
 });
 
 const corsOptions = {

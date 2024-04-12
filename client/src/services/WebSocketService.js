@@ -30,7 +30,8 @@ export const joinDocumentSession = (documentId, userId) => {
   }
 };
 
-export const disconnectWebSocket = () => {
+export const disconnectWebSocket = (userId) => {
+  console.log("Disconnecting user", userId)
   if (socket) {
     socket.disconnect();
   }
