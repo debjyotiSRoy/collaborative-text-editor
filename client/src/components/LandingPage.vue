@@ -80,7 +80,7 @@
     methods: {
       createNewItem() {
         console.log(this.$store.state.auth.user.userId)
-        axios.post('${backendUrl}/api/items', {
+        axios.post(`${backendUrl}/api/items`, {
           ...this.newItem,
           userId: this.userId, // Include user ID in the request body 
         })

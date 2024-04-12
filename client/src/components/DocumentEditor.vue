@@ -41,12 +41,13 @@
       // Listen for userLeft event and update connectedUsers
       socket.on('userLeft', ({ documentId, userId }) => {
         if (documentId === this.$route.params.documentId) {
+          console.log(`user ${userId} left this doc`);
           this.connectedUsers = this.connectedUsers.filter(user => user !== userId);
         }
       });
     },
     beforeUnmount() {
-      disconnectWebSocket(); // Call the function to disconnect WebSocket
+      disconnectWebSocket(this.$store.state.auth.user.userId); // Call the function to disconnect WebSocket
     },
     methods : {
       async fetchDocumentContent() {
