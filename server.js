@@ -176,7 +176,7 @@ app.get('/api/items', async (req, res) => {
       itemId: doc.id,
       ...doc.data()
     }));
-    console.log(formattedData);
+    //console.log(formattedData);
 
     res.status(200).json(formattedData);
   } catch (error) {
