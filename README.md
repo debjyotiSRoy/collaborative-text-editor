@@ -81,7 +81,99 @@ Navigate into the client subdirectory and install the necessary client dependenc
 cd client
 npm install
 ```
-![image description here](https://github.com/debjyotiSRoy/collaborative-text-editor/blob/master/setup1.png)
+### Running the Application
+![Khoury Linux Setup](https://github.com/debjyotiSRoy/collaborative-text-editor/blob/master/setup1.png)
+Follow the above image: We will create one server, and two clients. (You can create as many clients using the template below. I have shown the example with two clients)
+
+ 1. SERVER: Login to server with port forwarding
+```bash
+ssh -L 5000:localhost:5000  debjyoti@linux-085.khoury.northeastern.edu
+[deb@linux-085.khoury.northeastern.edu]> cd collaborative-text-editor
+[deb@linux-085.khoury.northeastern.edu]> node server.js
+```
+2. CLIENT 1a: Login to to client with port forwarding. Then from client login to server with port forwarding
+```bash
+ssh -L 8081:localhost:8081 debjyoti@linux-071.khoury.northeastern.edu
+[deb@linux-071.khoury.northeastern.edu]> ssh -L 5000:localhost:5000 linux-085
+[deb@linux-085.khoury.northeastern.edu]>
+```
+3. CLIENT 1b: Login to the same client as 1a, navigate to the client sub-directory. Then check if you can curl the server. Finally, run the client application at port 8081
+```bash
+ssh debjyoti@linux-071.khoury.northeastern.edu
+[deb@linux-071.khoury.northeastern.edu]> cd collaborative-text-editor/client
+[deb@linux-071.khoury.northeastern.edu]> curl -X OPTIONS -i http://localhost:5000/api/items
+
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+Access-Control-Allow-Headers: Content-Type,X-Auth-Token,Origin,Authorization
+Content-Length: 0
+Date: Tue, 16 Apr 2024 21:52:13 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+[deb@linux-071.khoury.northeastern.edu]> npm run serve -- --port 8081
+ 
+ WARNING  Compiled with 1 warning                                       6:26:24 PM
+
+ warning  in ./node_modules/@automerge/automerge-wasm/bundler/automerge_wasm_bg.wasm
+
+The generated code contains 'async/await' because this module is using "asyncWebAssembly".
+However, your target environment does not appear to support 'async/await'.
+As a result, the code may not run as expected or may cause runtime errors.
+
+
+  App running at:
+  - Local:   http://localhost:8081/
+  - Network: http://10.200.125.71:8081/
+
+  Note that the development build is not optimized.
+  To create a production build, run npm run build.
+```
+4. CLIENT 2a: Login to another client with (a different) port forwarding. Then from client login to server with port forwarding
+```bash
+ssh -L 8082:localhost:8082 debjyoti@linux-072.khoury.northeastern.edu
+[deb@linux-072.khoury.northeastern.edu]> ssh -L 5000:localhost:5000 linux-085
+[deb@linux-085.khoury.northeastern.edu]>
+```
+
+5. CLIENT 2b: Login to the same client as 2a, navigate to the client sub-directory. Then check if you can curl the server. Finally, run the client application at port 8082
+```bash
+ssh debjyoti@linux-072.khoury.northeastern.edu
+[deb@linux-072.khoury.northeastern.edu]> cd collaborative-text-editor/client
+[deb@linux-072.khoury.northeastern.edu]> curl -X OPTIONS -i http://localhost:5000/api/items
+
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+Access-Control-Allow-Headers: Content-Type,X-Auth-Token,Origin,Authorization
+Content-Length: 0
+Date: Tue, 16 Apr 2024 21:50:49 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+[deb@linux-072.khoury.northeastern.edu]> npm run serve -- --port 8082
+
+ WARNING  Compiled with 1 warning                                       6:37:48 PM
+
+ warning  in ./node_modules/@automerge/automerge-wasm/bundler/automerge_wasm_bg.wasm
+
+The generated code contains 'async/await' because this module is using "asyncWebAssembly".
+However, your target environment does not appear to support 'async/await'.
+As a result, the code may not run as expected or may cause runtime errors.
+
+
+  App running at:
+  - Local:   http://localhost:8082/
+  - Network: http://10.200.125.72:8082/
+
+  Note that the development build is not optimized.
+  To create a production build, run npm run build.
+```
+6. Now head over to your browser and and open and open two windows side by side with urls: http://localhost:8081/ and http://localhost:8082/. These are your two clients. Picture attached below for reference. 
+![Clients-sidebyside](https://github.com/debjyotiSRoy/collaborative-text-editor/blob/master/clientssidebyside.png)
 
 ## Contributing
 
