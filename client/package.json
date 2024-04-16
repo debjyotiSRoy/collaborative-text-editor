@@ -6,7 +6,7 @@
     "serve": "VUE_APP_BACKEND_URL=http://localhost:5000 vue-cli-service serve"
   },
   "dependencies": {
-    "@automerge/automerge": "^2.0.0",
+    "@automerge/automerge": "^2.1.13",
     "axios": "^1.6.8",
     "core-js": "^3.8.3",
     "cors": "^2.8.5",
