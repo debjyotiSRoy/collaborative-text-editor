@@ -37,3 +37,12 @@ export const disconnectWebSocket = (userId) => {
   }
 };
 
+export const sendDocumentSession = (documentId, lastLocalChange, doc) => {
+  console.log('last local change that will be sent to server (Inside WebSocket):', lastLocalChange);
+  if (socket) {
+    socket.emit('sendChanges', { documentId, lastLocalChange, doc });
+  } else {
+    console.error('WebSocket connection not established');
+  }
+};
+

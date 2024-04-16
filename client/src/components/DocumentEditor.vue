@@ -8,7 +8,7 @@
 
 <script>
   import axios from 'axios';
-  import { connectToWebSocket, joinDocumentSession, disconnectWebSocket } from '@/services/WebSocketService';
+  import { connectToWebSocket, joinDocumentSession, disconnectWebSocket, sendDocumentSession } from '@/services/WebSocketService';
   import * as automerge from "@automerge/automerge";
 
   const backendUrl = process.env.VUE_APP_BACKEND_URL;
@@ -46,6 +46,19 @@
         if (documentId === this.$route.params.documentId) {
           console.log(`user ${userId} left this doc`);
           this.connectedUsers = this.connectedUsers.filter(user => user !== userId);
+        }
+      });
+
+      // Listen for remote changes from WebSocket
+      socket.on('remoteChanges', ({ documentId, lastLocalChange, doc }) => {
+        console.log("information received about doc:", documentId)
+        if (documentId == this.$route.params.documentId) {
+          console.log('changes received from server:', lastLocalChange);
+          let remote_doc = automerge.from(doc)
+          console.log('doc received from server', remote_doc)
+          const lastLocalChangeConverted = new Uint8Array(lastLocalChange);
+          console.log('after convert what received from server: ', lastLocalChangeConverted);
+          this.applyRemoteChanges(lastLocalChangeConverted, remote_doc);
         }
       });
     },
@@ -103,6 +116,32 @@
         });
         // Automatically save changes when the user types
         this.saveDocumentContent();
+
+        // Send changes to the server via WebSocket
+        const lastLocalChange = automerge.getLastLocalChange(this.doc);
+        this.sendChangesToServer(lastLocalChange);
+        //this.doc = automerge.applyChanges(this.doc, lastLocalChange);
+      },
+      sendChangesToServer(lastLocalChange) {
+        // Send changes to the server via WebSocket
+        console.log('last local change that will be sent to server (Inside DocumentEditor):', lastLocalChange);
+        // let doc3 = automerge.applyChanges(this.doc, [lastLocalChange])[0]
+        // console.log("created a doc3, by applying the lastLocalChange made to doc to the doc:, doc now", doc3.content)
+        console.log("the doc that is sent to the server: ", this.doc)
+        console.log("*******")
+
+        sendDocumentSession(this.$route.params.documentId,lastLocalChange, automerge.clone(this.doc));
+      },
+      applyRemoteChanges(changes, remote_doc) {
+        // Apply remote changes to the local Automerge document
+
+        let doc4 = automerge.applyChanges(automerge.clone(this.doc), [changes])[0];
+        console.log("local:", this.doc.content, "\n remote: ", remote_doc.content)
+        let doc3 = automerge.merge(automerge.init(), automerge.clone(remote_doc));
+        // Update the document content to reflect the changes
+        this.documentContent = doc3.content;
+        console.log("After applying remote changes, \n doc3: ", doc3.content, "\n doc4: ", doc4.content)
+        console.log("#############")
       },
     }
   }

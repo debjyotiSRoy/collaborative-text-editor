@@ -42,6 +42,13 @@ io.on('connection', (socket) => {
     socket.emit('connectedUsers', connectedUsers);
   });
 
+  // Handle sending changes from client to server
+  socket.on('sendChanges', ({ documentId, lastLocalChange, doc }) => {
+    console.log('changes received by server:', lastLocalChange, " for document: ", documentId);
+    // Broadcast the changes to all connected clients except the sender
+    socket.broadcast.emit('remoteChanges', { documentId, lastLocalChange, doc });
+  });
+
   // Handle user leaving a document editing session
   socket.on('disconnect', () => {
     console.log('A user disconnected:');
