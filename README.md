@@ -60,6 +60,9 @@ To get started with the Collaborative Editor project, you can clone the GitHub r
 
 ```bash
 git clone https://github.com/debjyotiSRoy/collaborative-text-editor.git
+git tag -n
+git show submit
+git chekcout submit
 ```
 
 ### Installing Dependencies
