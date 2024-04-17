@@ -12,6 +12,10 @@
   import * as automerge from "@automerge/automerge";
 
   const backendUrl = process.env.VUE_APP_BACKEND_URL;
+  // In your Vue component
+  const timeout = process.env.VUE_APP_TIMEOUT ? parseInt(process.env.VUE_APP_TIMEOUT) : 1000;
+  console.log('timeout', timeout)
+
 
   export default {
     data() {
@@ -58,9 +62,14 @@
           console.log('doc received from server', remote_doc)
           const lastLocalChangeConverted = new Uint8Array(lastLocalChange);
           console.log('after convert what received from server: ', lastLocalChangeConverted);
-          this.applyRemoteChanges(lastLocalChangeConverted, remote_doc);
+          //this.applyRemoteChanges(lastLocalChangeConverted, remote_doc);
+          // Introduce a delay of 1000 milliseconds (1 second) before applying changes
+          setTimeout(() => {
+            this.applyRemoteChanges(lastLocalChangeConverted, remote_doc);
+          }, timeout);
         }
       });
+
     },
     beforeUnmount() {
       disconnectWebSocket(this.$store.state.auth.user.userId); // Call the function to disconnect WebSocket
