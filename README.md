@@ -1,7 +1,7 @@
 
 # Collaborative Editor
 
-Welcome to Collaborative Editor! This project is aimed at creating a collaborative text editor using JavaScript and Automerge.
+Welcome to Collaborative Editor! This project is aimed at creating a collaborative text editor using JavaScript.
 
 ## Getting Started
 
